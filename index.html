@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Risk Ranking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .result {
+      margin-top: 24px;
+      padding: 18px;
+      border-radius: 10px;
+      background: #eef2ff;
+      display: none;
+    }
+
+    .result h2 {
+      margin-top: 0;
+    }
+
+    .score {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .risk-low { color: #15803d; }
+    .risk-medium { color: #b45309; }
+    .risk-high { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Application Risk Ranking</h1>
+    <p>Enter an application name and select an answer for each question. The app will calculate the weighted score and assign a risk ranking.</p>
+
+    <div class="field">
+      <label for="appName">Application Name</label>
+      <input type="text" id="appName" placeholder="Enter application name" />
+    </div>
+
+    <div class="field">
+      <label for="proximity">Proximity to Financial Statement</label>
+      <select id="proximity">
+        <option value="3">High</option>
+        <option value="2">Medium</option>
+        <option value="1">Low</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="complexity">Complexity of Control Environment</label>
+      <select id="complexity">
+        <option value="3">High</option>
+        <option value="2">Medium</option>
+        <option value="1">Low</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="impact">Control Environment Impact</label>
+      <select id="impact">
+        <option value="3">High</option>
+        <option value="2">Medium</option>
+        <option value="1">Low</option>
+      </select>
+    </div>
+
+    <button onclick="calculateRisk()">Calculate Risk</button>
+
+    <div class="result" id="resultBox">
+      <h2>Result</h2>
+      <p><strong>Application:</strong> <span id="resultName"></span></p>
+      <p class="score">Final Score: <span id="finalScore"></span></p>
+      <p><strong>Risk Ranking:</strong> <span id="riskRanking"></span></p>
+    </div>
+  </div>
+
+  <script>
+    function calculateRisk() {
+      const appName = document.getElementById('appName').value.trim();
+      const proximity = Number(document.getElementById('proximity').value);
+      const complexity = Number(document.getElementById('complexity').value);
+      const impact = Number(document.getElementById('impact').value);
+
+      const finalScore = (proximity * 2) + complexity + impact;
+
+      let riskRanking = '';
+      let riskClass = '';
+
+      if (finalScore <= 6) {
+        riskRanking = 'Low';
+        riskClass = 'risk-low';
+      } else if (finalScore >= 7 && finalScore <= 8) {
+        riskRanking = 'Medium';
+        riskClass = 'risk-medium';
+      } else {
+        riskRanking = 'High';
+        riskClass = 'risk-high';
+      }
+
+      document.getElementById('resultName').textContent = appName || 'Not provided';
+      document.getElementById('finalScore').textContent = finalScore;
+
+      const riskRankingElement = document.getElementById('riskRanking');
+      riskRankingElement.textContent = riskRanking;
+      riskRankingElement.className = riskClass;
+
+      document.getElementById('resultBox').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
