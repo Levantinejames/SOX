@@ -185,40 +185,52 @@
       Low: 1
     };
 
-    function suggestFinancialProximity() {
-      const description = document.getElementById('appDescription').value.trim().toLowerCase();
-      let suggestedRating = 'Low';
-      let reason = 'The application description does not appear closely tied to financial statement processing.';
+    async function suggestFinancialProximity() {
+  const appName = document.getElementById('appName').value.trim();
+  const appDescription = document.getElementById('appDescription').value.trim();
 
-      if (
-        description.includes('general ledger') ||
-        description.includes('journal entry') ||
-        description.includes('financial reporting') ||
-        description.includes('close process') ||
-        description.includes('consolidation') ||
-        description.includes('financial statement')
-      ) {
-        suggestedRating = 'High';
-        reason = 'The application appears to directly support accounting records or financial reporting.';
-      } else if (
-        description.includes('invoice') ||
-        description.includes('billing') ||
-        description.includes('payroll') ||
-        description.includes('expense') ||
-        description.includes('accounts payable') ||
-        description.includes('accounts receivable') ||
-        description.includes('procurement')
-      ) {
-        suggestedRating = 'Medium';
-        reason = 'The application appears to support financial processes, but may not directly drive financial statements.';
-      }
+  if (!appDescription) {
+    alert('Please enter an application description first.');
+    return;
+  }
 
-      document.getElementById('suggestedRating').textContent = suggestedRating;
-      document.getElementById('suggestedReason').textContent = reason;
-      document.getElementById('suggestionBox').style.display = 'block';
-      document.getElementById('proximity').value = ratingMap[suggestedRating];
+  document.getElementById('suggestedRating').textContent = 'Loading...';
+  document.getElementById('suggestedReason').textContent = 'Generating suggestion...';
+  document.getElementById('suggestionBox').style.display = 'block';
+
+  try {
+    const response = await fetch('https://YOUR-VERCEL-PROJECT.vercel.app/api/suggest-proximity', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appName,
+        appDescription
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Request failed');
     }
 
+    document.getElementById('suggestedRating').textContent = data.suggested_rating;
+    document.getElementById('suggestedReason').textContent = data.reason;
+
+    const ratingMap = {
+      High: 3,
+      Medium: 2,
+      Low: 1
+    };
+
+    document.getElementById('proximity').value = ratingMap[data.suggested_rating];
+  } catch (error) {
+    document.getElementById('suggestedRating').textContent = 'Error';
+    document.getElementById('suggestedReason').textContent = error.message;
+  }
+}
     function calculateRisk() {
       const appName = document.getElementById('appName').value.trim();
       const proximity = Number(document.getElementById('proximity').value);
